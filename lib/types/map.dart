@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:fractal_base/extensions/stored.dart';
 import '../fractal.dart';
 
 mixin FMap<T extends Fractal> on FractalCtrl<T> {
@@ -22,6 +21,7 @@ mixin FMap<T extends Fractal> on FractalCtrl<T> {
   bool contains(int id) => map.containsKey(id);
 
   T put(MP item) {
+    final pass = item['pass'];
     final fractal = make(item);
     add(fractal);
     return fractal;

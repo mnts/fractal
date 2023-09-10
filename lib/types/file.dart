@@ -6,6 +6,8 @@ import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'dart:io' if (dart.library.html) 'file_idb.dart';
 export 'file_io.dart' if (dart.library.html) 'file_idb.dart';
+import 'dart:typed_data';
+import 'package:dart_bs58check/dart_bs58check.dart';
 
 extension Uint8List4FileF on Uint8List {
   FileF get fractal => FileF.bytes(this);
@@ -19,8 +21,8 @@ extension FileF4Completer on Completer {
 
 class FileF {
   static var path = './';
-  static const isSecure = false;
-  static String get host => isSecure ? 'find.io.cx' : 'localhost:8800';
+  static bool isSecure = false;
+  static String host = isSecure ? Uri.base.host : 'localhost:8800';
   static String get wsUrl => 'ws${FileF.isSecure ? 's' : ''}://${FileF.host}';
 
   static final cache = <String, Uint8List>{};
@@ -33,7 +35,15 @@ class FileF {
 
   static eat(Map<String, dynamic> m) {}
 
-  static String hash(Uint8List bytes) => md5.convert(bytes).toString();
+  static String hash(List<int> bytes) {
+    final b = md5.convert(bytes).bytes;
+
+    Uint8List h = Uint8List(4 + b.length);
+    ByteData.view(h.buffer).setUint32(0, b.length);
+    h.setRange(4, 4 + b.length, b);
+    return bs58check.encode(h);
+  }
+
   static final _map = <String, FileF>{};
   factory FileF(String name) {
     final file = _map[name] ??= FileF.fresh(
@@ -74,6 +84,8 @@ class FileF {
     stored.completed();
     return true;
   }
+
+  String get url => urlImage(name);
 
   static Future<ByteStream> download(String name) async {
     var url = Uri.parse(

@@ -22,6 +22,7 @@ dependencies:
   cross_file_image: ^1.0.0
   idb_shim: ^2.3.1
   http: ^1.1.0
+  dart_bs58check: ^3.0.2
   # path: ^1.8.0
 
 dev_dependencies:

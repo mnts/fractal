@@ -15,7 +15,7 @@ class FractalCtrl<T extends Fractal> extends Word {
     ],
   }) : super.id(name, ++Word.lastId) {
     _init();
-    print('$name ctrl defined');
+    print('$name ctrl defined for $T');
   }
 
   final Word extend;

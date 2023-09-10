@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:frac/frac.dart';
 import 'package:fractal/controllers/fractal.dart';
 import 'package:fractal_base/extensions/sql.dart';
@@ -9,6 +8,7 @@ export 'lib.dart';
 import 'c.dart';
 import 'types/map.dart';
 import 'types/mp.dart';
+export 'package:fractal_base/index.dart';
 
 class Fractal extends FChangeNotifier with FractalC {
   static final controller = FractalCtrl(
