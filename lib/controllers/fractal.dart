@@ -15,7 +15,16 @@ class FractalCtrl<T extends Fractal> extends Word {
     ],
   }) : super.id(name, ++Word.lastId) {
     _init();
-    print('$name ctrl defined for $T');
+    //print('$name ctrl defined for $T');
+  }
+
+  List<FractalCtrl> get controllers {
+    final ctrls = <FractalCtrl>[this];
+
+    while (ctrls.last.extend is FractalCtrl) {
+      ctrls.add(ctrls.last.extend as FractalCtrl);
+    }
+    return ctrls.sublist(1, ctrls.length - 1);
   }
 
   final Word extend;
@@ -28,7 +37,7 @@ class FractalCtrl<T extends Fractal> extends Word {
   late TableF table;
 
   FutureOr<void> init() async {
-    print('$name initiated');
+    //print('$name initiated');
     //make({});
 
     //map.values.where((ctrl) => ctrl is this.runtimeType);
@@ -41,6 +50,8 @@ class FractalCtrl<T extends Fractal> extends Word {
   //Type get fractalType => Fractal;
 
   static final map = <String, FractalCtrl>{};
+
+  static Iterable<S> where<S>() => map.values.whereType<S>();
 
   _init() {
     map[name] = this;
