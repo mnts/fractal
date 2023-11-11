@@ -45,7 +45,7 @@ class FractalCtrl<T extends Fractal> extends Word {
     table = initSql();
   }
 
-  T Function(dynamic) make;
+  FutureOr<T> Function(dynamic) make;
   late T initial;
   //Type get fractalType => Fractal;
 

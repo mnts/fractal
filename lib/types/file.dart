@@ -22,6 +22,7 @@ extension FileF4Completer on Completer {
 class FileF {
   static var path = './';
   static bool isSecure = false;
+  static String main = 'localhost';
   static String host = isSecure ? Uri.base.host : 'localhost:8800';
   static String get wsUrl => 'ws${FileF.isSecure ? 's' : ''}://${FileF.host}';
 

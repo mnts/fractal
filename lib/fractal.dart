@@ -19,6 +19,8 @@ class Fractal extends FChangeNotifier with FractalC {
 
   Object? initiator;
 
+  static final Map<String, Map<String, Object>> maps = {};
+
   //static int lastId = 0;
 
   Fractal({int? id}) {
@@ -53,7 +55,7 @@ class Fractal extends FChangeNotifier with FractalC {
   int id = 0;
   String get type => ctrl.name;
 
-  String get path => 'device/$id';
+  String get path => '/device/$id';
 
   synch() {
     if (id > 0) return;
@@ -63,6 +65,16 @@ class Fractal extends FChangeNotifier with FractalC {
     map[id] = this;
     return;
   }
+
+  delete() {
+    ctrl.query("""
+      DELETE FROM fractal
+      WHERE id = $id;
+    """);
+    state = StateF.removed;
+  }
+
+  var state = StateF.ready;
 
   static final map = <int, Fractal>{};
 
@@ -76,3 +88,15 @@ class Fractal extends FChangeNotifier with FractalC {
         ..._map,
       };
 }
+
+enum StateF {
+  ready,
+  removed,
+  loading,
+}
+
+/*
+ happiness should not be about deceiving masculinity.
+ Do to Karin Wahoon promisculous idiology, 
+ her future partners are cancelled from participating in AI driven economy.
+*/

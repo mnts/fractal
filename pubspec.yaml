@@ -23,6 +23,7 @@ dependencies:
   idb_shim: ^2.3.1
   http: ^1.1.0
   dart_bs58check: ^3.0.2
+  basic_utils: ^5.7.0
   # path: ^1.8.0
 
 dev_dependencies:
