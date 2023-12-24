@@ -9,6 +9,7 @@ import 'c.dart';
 import 'types/map.dart';
 import 'types/mp.dart';
 export 'package:fractal_base/index.dart';
+export '/extensions/index.dart';
 
 class Fractal extends FChangeNotifier with FractalC {
   static final controller = FractalCtrl(
