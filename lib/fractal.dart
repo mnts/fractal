@@ -1,12 +1,8 @@
 import 'dart:async';
 import 'package:frac/frac.dart';
-import 'package:fractal/controllers/fractal.dart';
-import 'package:fractal_base/extensions/sql.dart';
-import 'package:fractal_base/extensions/stored.dart';
-import 'package:fractal_word/word.dart';
 export 'lib.dart';
 import 'c.dart';
-import 'types/map.dart';
+import 'lib.dart';
 import 'types/mp.dart';
 export 'package:fractal_base/index.dart';
 export '/extensions/index.dart';
@@ -15,6 +11,16 @@ class Fractal extends FChangeNotifier with FractalC {
   static final controller = FractalCtrl(
     name: 'fractal',
     make: (m) => Fractal(),
+    attributes: <Attr>[
+      Attr(
+        name: 'type',
+        format: 'TEXT',
+      ),
+      Attr(
+        name: 'url',
+        format: 'TEXT',
+      ),
+    ],
   );
   FractalCtrl get ctrl => controller;
 
@@ -37,6 +43,11 @@ class Fractal extends FChangeNotifier with FractalC {
     return 0;
   }
 
+  Future<int> preload() async {
+    return 1;
+  }
+
+  /*
   static FutureOr<Fractal> discoverq(int id) {
     if (map.containsKey(id)) return map[id]!;
     final res = controller.db.select(
@@ -52,6 +63,7 @@ class Fractal extends FChangeNotifier with FractalC {
       _ => throw Exception('wrong type ${m['type']}'),
     };
   }
+  */
 
   int id = 0;
   String get type => ctrl.name;
@@ -61,7 +73,12 @@ class Fractal extends FChangeNotifier with FractalC {
   synch() {
     if (id > 0) return;
     final m = toMap();
-    id = ctrl.store(m);
+
+    try {
+      id = ctrl.store(m);
+    } catch (e) {
+      print(e);
+    }
     if (id == 0) return;
     map[id] = this;
     return;
@@ -88,6 +105,14 @@ class Fractal extends FChangeNotifier with FractalC {
         'id': id,
         ..._map,
       };
+
+  Object? operator [](String key) {
+    return switch (key) {
+      'id' => id,
+      'type' => type,
+      _ => null,
+    };
+  }
 }
 
 enum StateF {

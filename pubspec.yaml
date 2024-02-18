@@ -4,7 +4,6 @@ version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 publish_to: none
 
-
 environment:
   sdk: '>=3.2.0 <4.0.0'
 
@@ -18,14 +17,15 @@ dependencies:
     path: ../fractal_base
   universal_file: ^1.0.0
   universal_io: ^2.2.2
-  cross_file: ^0.3.3+4
-  cross_file_image: ^1.0.0
-  idb_shim: ^2.3.1
+  cross_file: ^0.3.3+8
+  cross_file_image: ^1.1.0
   http: ^1.1.0
   dart_bs58check: ^3.0.2
   basic_utils: ^5.7.0
   # path: ^1.8.0
+  sembast: ^3.5.0+1
+  idb_shim:
 
 dev_dependencies:
-  lints: ^2.0.0
+  lints: ^3.0.0
   test: ^1.21.0

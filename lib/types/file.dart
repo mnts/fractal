@@ -24,7 +24,8 @@ class FileF {
   static bool isSecure = false;
   static String main = 'localhost';
   static String host = isSecure ? Uri.base.host : 'localhost:8800';
-  static String get wsUrl => 'ws${FileF.isSecure ? 's' : ''}://${FileF.host}';
+  static String wsUrl(String server) =>
+      'ws${FileF.isSecure ? 's' : ''}://$server';
 
   static final cache = <String, Uint8List>{};
 
@@ -50,7 +51,6 @@ class FileF {
     final file = _map[name] ??= FileF.fresh(
       name,
     );
-    file.reload();
     return file;
   }
 
@@ -72,7 +72,9 @@ class FileF {
   FileF.fresh(this.name)
       : file = File(
           join(path, 'cache', name),
-        );
+        ) {
+    reload();
+  }
 
   init() async {}
 
@@ -142,18 +144,22 @@ class FileF {
     return unixSeconds;
   }
 
-  Future<Uint8List> reload() async {
+  reload() {
     try {
-      bytes = await file.readAsBytes();
+      file.readAsBytes().then((value) {
+        bytes = value;
+        stored.completed();
+      }, onError: (error, stackTrace) {
+        stored.completed();
+      });
+    } catch (_) {
       stored.completed();
-    } catch (_) {}
-    return bytes;
+    }
+    //return bytes;
   }
 
   Future<Uint8List> load() async {
-    if (!stored.isCompleted) {
-      await reload();
-    }
+    await stored.future;
     if (bytes.isEmpty) {
       final stream = await download(name);
       bytes = await stream.toBytes();

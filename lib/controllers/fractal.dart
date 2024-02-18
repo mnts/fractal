@@ -9,10 +9,7 @@ class FractalCtrl<T extends Fractal> extends Word {
     this.extend = Word.god,
     String name = 'fractal',
     required this.make,
-    this.attributes = const <Attr>[
-      Attr('type', String),
-      Attr('url', String),
-    ],
+    required this.attributes,
   }) : super.id(name, ++Word.lastId) {
     _init();
     //print('$name ctrl defined for $T');
@@ -51,7 +48,8 @@ class FractalCtrl<T extends Fractal> extends Word {
 
   static final map = <String, FractalCtrl>{};
 
-  static Iterable<S> where<S>() => map.values.whereType<S>();
+  static Iterable<S> where<S extends FractalCtrl>() =>
+      map.values.whereType<S>();
 
   _init() {
     map[name] = this;
