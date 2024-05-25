@@ -43,7 +43,7 @@ class Fractal extends FChangeNotifier with FractalC {
     return 0;
   }
 
-  Future<int> preload() async {
+  Future<int> preload([String? type]) async {
     return 1;
   }
 
@@ -70,18 +70,18 @@ class Fractal extends FChangeNotifier with FractalC {
 
   String get path => '/device/$id';
 
-  synch() {
-    if (id > 0) return;
+  Future synch() async {
+    if (id > 0) return 0;
     final m = toMap();
 
     try {
-      id = ctrl.store(m);
+      id = await ctrl.store(m);
     } catch (e) {
       print(e);
     }
-    if (id == 0) return;
+    if (id == 0) return 0;
     map[id] = this;
-    return;
+    return id;
   }
 
   delete() {

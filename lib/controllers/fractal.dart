@@ -39,7 +39,8 @@ class FractalCtrl<T extends Fractal> extends Word {
 
     //map.values.where((ctrl) => ctrl is this.runtimeType);
 
-    table = initSql();
+    table = await initSql();
+    initIndexes();
   }
 
   FutureOr<T> Function(dynamic) make;
@@ -50,6 +51,13 @@ class FractalCtrl<T extends Fractal> extends Word {
 
   static Iterable<S> where<S extends FractalCtrl>() =>
       map.values.whereType<S>();
+
+  final sub = <FractalCtrl>[];
+
+  List<FractalCtrl> get top => [
+        ...sub,
+        for (final s in sub) ...s.top,
+      ];
 
   _init() {
     map[name] = this;
