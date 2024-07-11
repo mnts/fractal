@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:fractal_base/extensions/sql.dart';
-import 'package:fractal_base/models/index.dart';
 import 'package:fractal_word/word.dart';
 import '../fractal.dart';
 
@@ -40,7 +38,7 @@ class FractalCtrl<T extends Fractal> extends Word {
     //map.values.where((ctrl) => ctrl is this.runtimeType);
 
     table = await initSql();
-    initIndexes();
+    await initIndexes();
   }
 
   FutureOr<T> Function(dynamic) make;

@@ -29,7 +29,8 @@ class FileF {
 
   static final cache = <String, Uint8List>{};
 
-  static String urlImage(String hash) => "$http/uploads/$hash";
+  static final urlImage = urlFile;
+  static String urlFile(String hash) => "$http/uploads/$hash";
 
   static String get http => "http${isSecure ? 's' : ''}://$host";
 

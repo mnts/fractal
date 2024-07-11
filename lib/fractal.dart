@@ -13,6 +13,12 @@ class Fractal extends FChangeNotifier with FractalC {
     make: (m) => Fractal(),
     attributes: <Attr>[
       Attr(
+        name: 'id',
+        format: 'INTEGER',
+        isImmutable: true,
+        skipCreate: true,
+      ),
+      Attr(
         name: 'type',
         format: 'TEXT',
       ),
@@ -35,8 +41,6 @@ class Fractal extends FChangeNotifier with FractalC {
       map[id] = this;
       this.id = id;
     }
-
-    initiate();
   }
 
   Future<int> initiate() async {
@@ -73,6 +77,7 @@ class Fractal extends FChangeNotifier with FractalC {
   Future synch() async {
     if (id > 0) return 0;
     final m = toMap();
+    m.remove('id');
 
     try {
       id = await ctrl.store(m);
