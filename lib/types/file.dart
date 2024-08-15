@@ -71,9 +71,11 @@ class FileF {
 
   String name;
   FileF.fresh(this.name)
-      : file = File(
-          join(path, 'cache', name),
-        ) {
+      : file = name[0] == '/'
+            ? File(name)
+            : File(
+                join(path, 'cache', name),
+              ) {
     reload();
   }
 
@@ -159,11 +161,16 @@ class FileF {
     //return bytes;
   }
 
+  Completer? loading;
   Future<Uint8List> load() async {
     await stored.future;
+    await loading?.future;
     if (bytes.isEmpty) {
+      loading ??= Completer();
       final stream = await download(name);
       bytes = await stream.toBytes();
+      await store();
+      if (loading?.isCompleted == false) loading!.complete();
     }
     return bytes;
   }

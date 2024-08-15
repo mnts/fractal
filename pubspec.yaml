@@ -5,14 +5,12 @@ version: 1.0.0
 publish_to: none
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 # Add regular dependencies here.
 dependencies:
   frac:
     path: ../frac
-  fractal_word:
-    path: ../fractal_word
   fractal_base:
     path: ../fractal_base
   universal_file: ^1.0.0
@@ -28,5 +26,4 @@ dependencies:
 
 
 dev_dependencies:
-  lints: ^3.0.0
-  test: ^1.21.0
+  lints: ^4.0.0

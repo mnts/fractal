@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:fractal_word/word.dart';
+import 'package:frac/index.dart';
 import '../fractal.dart';
 
 class FractalCtrl<T extends Fractal> extends Word {
@@ -21,6 +21,15 @@ class FractalCtrl<T extends Fractal> extends Word {
     }
     return ctrls.sublist(1, ctrls.length - 1);
   }
+
+  /*
+  final refs = <String, T>{};
+  static Fractal? refer(String ref) {
+    for (var ctrl in EventFractal.controller.controllers) {
+      return ctrl.refs[];
+    }
+  }
+  */
 
   final Word extend;
 
