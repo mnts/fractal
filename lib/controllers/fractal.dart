@@ -34,6 +34,10 @@ class FractalCtrl<T extends Fractal> extends Word {
   final Word extend;
 
   final List<Attr> attributes;
+  late final Map<String, Attr> allAttributes = Map.fromEntries([
+    ...attributes,
+    for (var ctrl in controllers) ...ctrl.attributes,
+  ].map((attr) => MapEntry(attr.name, attr)));
 
   final listeners = <Function(T)>[];
 
@@ -48,6 +52,7 @@ class FractalCtrl<T extends Fractal> extends Word {
 
     table = await initSql();
     await initIndexes();
+    return;
   }
 
   FutureOr<T> Function(dynamic) make;
