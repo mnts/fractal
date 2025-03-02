@@ -1,44 +1,42 @@
 import 'dart:async';
-import 'package:frac/frac.dart';
 export 'lib.dart';
-import 'c.dart';
 import 'lib.dart';
-import '/enums/index.dart';
-import 'types/mp.dart';
 export '/enums/index.dart';
 export 'package:fractal_base/index.dart';
 export '/extensions/index.dart';
 
-class Fractal extends FChangeNotifier with FractalC, Axi {
+class Fractal extends FChangeNotifier
+    with FractalC, Axi
+    implements FilterableF {
   static final controller = FractalCtrl(
     name: 'fractal',
     make: (m) => Fractal(),
     attributes: <Attr>[
       Attr(
         name: 'id',
-        format: 'INTEGER',
+        format: FormatF.integer,
         isImmutable: true,
         skipCreate: true,
         isIndex: true,
       ),
       Attr(
         name: 'stored_at',
-        format: 'INTEGER',
+        format: FormatF.integer,
         isIndex: true,
       ),
       Attr(
         name: 'type',
-        format: 'TEXT',
+        format: FormatF.text,
         isIndex: true,
       ),
       Attr(
         name: 'kind',
-        format: 'INTEGER',
+        format: FormatF.integer,
         def: '0',
       ),
       Attr(
         name: 'url',
-        format: 'TEXT',
+        format: FormatF.text,
       ),
     ],
   );
@@ -103,16 +101,21 @@ class Fractal extends FChangeNotifier with FractalC, Axi {
   String get path => '/device/$id';
   int storedAt = 0;
 
+  Future<int>? storing;
   Future<int> store([MP? m]) async {
-    if (kind == FKind.tmp) return -1;
+    if (kind == FKind.tmp) return 0;
     if (storedAt > 0) return id;
-    MP map = {
+    if (storing != null) return storing!;
+    MP mp = {
       ...toMap(),
       ...?m,
       'stored_at': unixSeconds,
     };
-    map.remove('id');
-    id = await ctrl.store(map);
+    mp.remove('id');
+    storing = ctrl.store(mp);
+    id = await storing!;
+    if (id == 0) return 0;
+    map[id] = this;
     return id;
   }
 
@@ -129,8 +132,6 @@ class Fractal extends FChangeNotifier with FractalC, Axi {
     } catch (e) {
       print(e);
     }
-    if (id == 0) return 0;
-    map[id] = this;
     return id;
   }
 
@@ -144,7 +145,7 @@ class Fractal extends FChangeNotifier with FractalC, Axi {
 
   var state = StateF.ready;
 
-  static final map = <int, Fractal>{};
+  static final map = MapF<Fractal>();
 
   resolve(String key) {
     if (this[key] case Object val) {
@@ -156,6 +157,7 @@ class Fractal extends FChangeNotifier with FractalC, Axi {
     return switch (key) {
       'id' => id,
       'type' => type,
+      'kind' => kind.index,
       _ => null,
     };
   }

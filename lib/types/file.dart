@@ -4,9 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:fractal/fractal.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
-import 'dart:io' if (dart.library.html) 'file_idb.dart';
-export 'file_io.dart' if (dart.library.html) 'file_idb.dart';
-import 'dart:typed_data';
+export 'file/io.dart' if (dart.library.html) 'file/idb.dart';
 import 'package:dart_bs58check/dart_bs58check.dart';
 
 extension Uint8List4FileF on Uint8List {
@@ -20,6 +18,7 @@ extension FileF4Completer on Completer {
 }
 
 class FileF {
+  static bool isWeb = false;
   static var path = './';
   static bool isSecure = false;
   static String main = 'localhost';
@@ -29,13 +28,12 @@ class FileF {
 
   static final cache = <String, Uint8List>{};
 
-  static final urlImage = urlFile;
-  static String urlFile(String hash) => "$http/uploads/$hash";
+  //static final urlImage = urlFile;
+  static var urlFile = (String hash) => Uri.parse("$http/uploads/$hash");
 
   static String get http => "http${isSecure ? 's' : ''}://$host";
 
   //static final dateFormat = DateFormat('MM-dd-yyyy kk:mm');
-
   static eat(Map<String, dynamic> m) {}
 
   static String hash(List<int> bytes) {
@@ -56,58 +54,63 @@ class FileF {
   }
 
   static final emptyBytes = Uint8List(0);
+  late String fileName = name;
 
   final File file;
   var bytes = emptyBytes;
   factory FileF.bytes(Uint8List bytes) {
     final name = hash(bytes);
-    final file = _map[name] ??= FileF.fresh(name);
-    file
-      ..bytes = bytes
-      ..init()
-      ..store();
-    return file;
+    final f = _map[name] ??= FileF.fresh(name);
+
+    f.bytes = bytes;
+    //f.initBytes();
+    return f;
   }
 
   String name;
-  FileF.fresh(this.name)
-      : file = name[0] == '/'
-            ? File(name)
-            : File(
-                join(path, 'cache', name),
-              ) {
-    reload();
-  }
+  FileF.fresh(this.name) : file = getFile(name);
 
-  init() async {}
+  static getFile(String name) => name.isNotEmpty && name[0] == '/'
+      ? File(name)
+      : File(
+          join(path, 'cache', name),
+        );
+
+  /*
+  initBytes() async {
+    if (!await file.exists()) {
+      await store();
+    }
+  }
+  */
 
   bool get isReady => bytes == emptyBytes;
   final stored = Completer();
-  FutureOr<bool> store() async {
-    if (await file.exists()) return true;
+  Future<bool> store() async {
     file.createSync(recursive: true);
     await file.writeAsBytes(bytes);
     stored.completed();
     return true;
   }
 
-  String get url => urlImage(name);
-
-  static Future<ByteStream> download(String name) async {
-    var url = Uri.parse(
-      "$http/uploads/$name",
-    );
-
-    // Create a MultipartRequest object to hold the file data
-    var request = Request('GET', url);
-    final re = await request.send();
-
-    return re.stream;
-  }
+  String get url => urlFile(name).toString();
 
   final uploaded = Completer();
+  static Future<String?> Function(FileF)? uploader;
   Future<int> upload() async {
     if (uploaded.isCompleted) return 200;
+
+    final re = await Request('GET', urlFile(name)).send();
+    if (re.statusCode == 200 || re.statusCode == 204) {
+      uploaded.complete();
+      return 200;
+    }
+
+    if (uploader != null) {
+      final serverPath = await uploader!(this);
+      if (serverPath != null) uploaded.complete();
+      return 200;
+    }
 
     var url = Uri.parse(
       "$http/upload",
@@ -134,44 +137,59 @@ class FileF {
     return 0;
   }
 
-  final published = Completer<int>();
-  Future<int> publish() async {
-    if (published.isCompleted) return published.future;
-
-    await store();
-
-    upload().then((status) {
-      if (status == 200) published.complete(unixSeconds);
-    });
-
-    return unixSeconds;
+  //Completer<int>? publishing;
+  Future<void> publish() async {
+    await Future.wait([store(), upload()]);
+    return;
   }
 
-  reload() {
+  Completer<void>? reading;
+  read() {
+    if (reading != null) return;
+    reading ??= Completer();
     try {
       file.readAsBytes().then((value) {
         bytes = value;
         stored.completed();
+        reading!.complete();
       }, onError: (error, stackTrace) {
         stored.completed();
+        reading!.complete();
       });
     } catch (_) {
       stored.completed();
+      reading!.complete();
     }
     //return bytes;
   }
 
-  Completer? loading;
-  Future<Uint8List> load() async {
-    await stored.future;
-    await loading?.future;
+  Completer<void>? loading;
+  Future<void> load() async {
+    read();
+    if (reading != null) await reading!.future;
+    if (loading != null) return loading!.future;
     if (bytes.isEmpty) {
       loading ??= Completer();
-      final stream = await download(name);
-      bytes = await stream.toBytes();
-      await store();
+      try {
+        bytes = await download(name);
+        store();
+      } catch (e) {
+        print(e);
+      }
+
       if (loading?.isCompleted == false) loading!.complete();
     }
-    return bytes;
+    return;
+  }
+
+  static Future<Uint8List> download(String name) async {
+    // Create a MultipartRequest object to hold the file data
+    var request = Request('GET', urlFile(name));
+    final re = await request.send();
+
+    if (re.statusCode == 200 || re.statusCode == 204) {
+      return re.stream.toBytes();
+    }
+    throw Exception('cant download $name');
   }
 }

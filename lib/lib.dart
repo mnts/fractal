@@ -5,4 +5,6 @@ export 'utils.dart';
 export 'data.dart';
 export 'policies/policies.dart';
 export 'types/index.dart';
+export 'utils/index.dart';
 export 'package:axi/axi.dart';
+export 'package:frac/frac.dart';

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'file.dart';
-export 'file_io.dart' if (dart.library.html) 'file_idb.dart';
+//export 'file/.dart' if (dart.library.html) 'file_idb.dart';
 
 class ImageF extends FileF {
   static final _map = <String, ImageF>{};
@@ -15,5 +15,5 @@ class ImageF extends FileF {
     return file;
   }
 
-  ImageF.fresh(String name) : super.fresh(name);
+  ImageF.fresh(super.name) : super.fresh();
 }

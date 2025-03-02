@@ -1,3 +1,4 @@
+/*
 import 'package:fractal_base/models/attr.dart';
 
 class FilterF {
@@ -17,3 +18,5 @@ enum FilterBy {
   gt,
   lt,
 }
+
+*/
