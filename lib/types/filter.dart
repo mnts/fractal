@@ -1,5 +1,5 @@
 /*
-import 'package:fractal_base/models/attr.dart';
+import 'package:fractal/models/attr.dart';
 
 class FilterF {
   final Attr attr;

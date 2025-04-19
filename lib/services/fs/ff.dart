@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
-import 'package:fractal/fractal.dart';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
-export 'file/io.dart' if (dart.library.html) 'file/idb.dart';
+export './file.dart';
 import 'package:dart_bs58check/dart_bs58check.dart';
+
+import 'file.dart';
 
 extension Uint8List4FileF on Uint8List {
   FileF get fractal => FileF.bytes(this);
@@ -28,8 +29,12 @@ class FileF {
 
   static final cache = <String, Uint8List>{};
 
+  static final rxpUrl = RegExp("^(http|https)://");
+
   //static final urlImage = urlFile;
-  static var urlFile = (String hash) => Uri.parse("$http/uploads/$hash");
+  static var urlFile = (String u) => Uri.parse(
+        rxpUrl.hasMatch(u) ? u : "$http/uploads/$u",
+      );
 
   static String get http => "http${isSecure ? 's' : ''}://$host";
 
@@ -172,10 +177,10 @@ class FileF {
       loading ??= Completer();
       try {
         bytes = await download(name);
-        store();
       } catch (e) {
         print(e);
       }
+      store();
 
       if (loading?.isCompleted == false) loading!.complete();
     }

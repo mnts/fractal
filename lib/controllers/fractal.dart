@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:frac/index.dart';
-import '../fractal.dart';
+import 'package:fractal/frac/index.dart';
+import '../index.dart';
 
 class FractalCtrl<T extends Fractal> extends Word {
   FractalCtrl({
@@ -12,6 +12,8 @@ class FractalCtrl<T extends Fractal> extends Word {
     _init();
     //print('$name ctrl defined for $T');
   }
+
+  late final NodeFractal node;
 
   List<FractalCtrl> get controllers {
     final ctrls = <FractalCtrl>[this];
@@ -42,17 +44,28 @@ class FractalCtrl<T extends Fractal> extends Word {
   final listeners = <Function(T)>[];
 
   final selector = SqlContext();
-  late TableF table;
+  //final table = Completer<TableF>();
 
-  FutureOr<void> init() async {
+  Completer<bool>? initiating;
+  FutureOr init() async {
     //print('$name initiated');
     //make({});
 
     //map.values.where((ctrl) => ctrl is this.runtimeType);
 
-    table = await initSql();
-    await initIndexes();
-    return;
+    if (initiating == null) {
+      initiating = Completer<bool>();
+    } else {
+      return initiating!.future;
+    }
+
+    if (extend case FractalCtrl extF) {
+      await extF.init();
+    }
+
+    await initSql();
+    initiating!.complete(true);
+    return true;
   }
 
   FutureOr<T> Function(dynamic) make;

@@ -1,4 +1,4 @@
-import 'package:fractal/fractal.dart';
+import '../index.dart';
 
 extension FractalMatch on FilterableF {
   bool match(MP filter) {

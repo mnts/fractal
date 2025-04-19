@@ -1,4 +1,4 @@
-import '../lib.dart';
+import '../index.dart';
 
 class MakeF {
   MP map = {};

@@ -1,4 +1,4 @@
-import 'fractal.dart';
+import 'models/fractal.dart';
 
 mixin FractalC<T extends Fractal> {
   static final options = <String, List<String>?>{};

@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'file.dart';
+import '../services/fs/ff.dart';
 //export 'file/.dart' if (dart.library.html) 'file_idb.dart';
 
 class ImageF extends FileF {

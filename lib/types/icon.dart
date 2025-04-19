@@ -1,3 +1,4 @@
+/*
 class IconF {
   static const _fontFamily = 'MaterialIcons';
 
@@ -6,3 +7,4 @@ class IconF {
 
   const IconF(this.codePoint);
 }
+*/

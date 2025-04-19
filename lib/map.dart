@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:fractal/fractal.dart';
+import 'index.dart';
 
 mixin MF<T> on FlowF<T> {
   var map = <Object, T>{};
@@ -43,7 +43,7 @@ mixin MF<T> on FlowF<T> {
     }
   }
 
-  T? operator [](Object key) {
+  T? operator [](key) {
     return map[key]; // ??= word.frac() ?? Frac('');
   }
 

@@ -1,24 +1,23 @@
 import 'dart:async';
-export 'lib.dart';
-import 'lib.dart';
-export '/enums/index.dart';
-export 'package:fractal_base/index.dart';
-export '/extensions/index.dart';
+import '../index.dart';
+import '../mixins/mpf.dart';
 
 class Fractal extends FChangeNotifier
-    with FractalC, Axi
-    implements FilterableF {
+    with FractalC, Axi, MPF
+    implements FilterableF, MP {
+  static final idAttr = Attr(
+    name: 'id',
+    format: FormatF.integer,
+    isImmutable: true,
+    skipCreate: true,
+    isIndex: true,
+  );
+
   static final controller = FractalCtrl(
     name: 'fractal',
     make: (m) => Fractal(),
     attributes: <Attr>[
-      Attr(
-        name: 'id',
-        format: FormatF.integer,
-        isImmutable: true,
-        skipCreate: true,
-        isIndex: true,
-      ),
+      idAttr,
       Attr(
         name: 'stored_at',
         format: FormatF.integer,
@@ -55,7 +54,7 @@ class Fractal extends FChangeNotifier
     this.kind = FKind.basic,
   }) {
     if (id != 0 && id != null) {
-      map[id] = this;
+      storage[id] = this;
       this.id = id;
     }
   }
@@ -64,7 +63,7 @@ class Fractal extends FChangeNotifier
       : kind = FKind.values[d['kind'] ?? 0],
         storedAt = d['stored_at'] ?? 0 {
     if (d['id'] case int id) {
-      map[id] = this;
+      storage[id] = this;
       this.id = id;
     }
   }
@@ -95,6 +94,8 @@ class Fractal extends FChangeNotifier
   }
   */
 
+  String get key => '#$id';
+
   int id = 0;
   String get type => ctrl.name;
 
@@ -104,20 +105,25 @@ class Fractal extends FChangeNotifier
   Future<int>? storing;
   Future<int> store([MP? m]) async {
     if (kind == FKind.tmp) return 0;
-    if (storedAt > 0) return id;
+    if (storedAt > 0) return this.id;
     if (storing != null) return storing!;
     MP mp = {
       ...toMap(),
       ...?m,
       'stored_at': unixSeconds,
     };
-    mp.remove('id');
-    storing = ctrl.store(mp);
-    id = await storing!;
-    if (id == 0) return 0;
-    map[id] = this;
+    if (mp['id'] case int id) return id;
+
+    //mp.remove('id');
+    final id = mp['id'] = ++db.lastId;
+    final isOk = await ctrl.store(mp);
+    if (!isOk) return 0;
+    this.id = id;
+    storage[id] = this;
     return id;
   }
+
+  spread(thing) {}
 
   MP toMap() => {
         'type': type,
@@ -145,7 +151,7 @@ class Fractal extends FChangeNotifier
 
   var state = StateF.ready;
 
-  static final map = MapF<Fractal>();
+  static final storage = MapF<Fractal>();
 
   resolve(String key) {
     if (this[key] case Object val) {
@@ -153,7 +159,8 @@ class Fractal extends FChangeNotifier
     }
   }
 
-  Object? operator [](String key) {
+  @override
+  Object? operator [](Object? key) {
     return switch (key) {
       'id' => id,
       'type' => type,
